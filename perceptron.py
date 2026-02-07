@@ -1,32 +1,27 @@
-import numpy as np 
+import numpy as np
 
 class PERCEPTRON:
 
-    def __init__(self, learning_rate=0.01, num_iterations=1000):
-        self.lr = learning_rate
-        self.n_iters = num_iterations
-        self.activation_function = self._relu_function
-        self.weights = None
-        self.bias = None
-    
-    def fit(self,X,y):
-        n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
-        self.bias = 0
-        
-        for _ in range(self.n_iters):
-            for idx, x_i in enumerate(X):
-                z = np.dot(x_i, self.weights) + self.bias
-                y_pred = self.activation_function(z)
+    def __init__(self, lr=0.01, n_iters=1000):
+        self.lr = lr
+        self.n_iters = n_iters
+        self.w = None
+        self.b = None
 
-                update = self.lr * (y[idx] - y_pred)
-                self.weights += update * x_i
-                self.bias += update
-    
-    def _relu_function(self,x):
-        return np.maximum(0,x)
-    
-    def predict(self,x):
-        z = np.dot(x, self.weights) + self.bias
-        y_pred = self.activation_function(z)
-        return y_pred
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.w = np.zeros(n_features)
+        self.b = 0
+
+        for _ in range(self.n_iters):
+            for i in range(n_samples):
+                z = np.dot(X[i], self.w) + self.b
+                y_pred = 1 if z >= 0 else -1
+
+                if y[i] != y_pred:
+                    self.w += self.lr * y[i] * X[i]
+                    self.b += self.lr * y[i]
+
+    def predict(self, X):
+        z = np.dot(X, self.w) + self.b
+        return np.where(z >= 0, 1, -1)
